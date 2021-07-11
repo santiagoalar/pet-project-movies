@@ -39,7 +39,7 @@ app.get(`${apiRoot}/movies-genre/`, makeCallback(getMoviesGenre)); // get by gen
 app.patch(`${apiRoot}/movie/:id`, makeCallback(patchMovie)); //patch name
 app.patch(`${apiRoot}/movie-url/:id`, makeCallback(patchMovieUrl)); //patch url
 app.delete(`${apiRoot}/movie/:id`, makeCallback(deleteMovie));
-
+app.delete(`${apiRoot}/movie`, makeCallback(deleteMovie));
 
 // listen for requests
 app.listen(3000, () => {
