@@ -10,6 +10,7 @@ dotenv.config()
 describe('Movie API', () => {
   beforeAll(() => {
     //axios.defaults.baseURL = process.env.DM_BASE_URL + process.env.DM_API_ROOT
+    require('../src/config/conexion');
     axios.defaults.baseURL = process.env.DM_BASE_URL;
     console.log("************************** " + axios.defaults.baseURL)
     axios.defaults.headers.common['Content-Type'] = 'application/json'
