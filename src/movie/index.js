@@ -18,6 +18,9 @@ module.exports = function buildMakeComment (movieInfo) {
       if (!movieInfo.cast || movieInfo.cast.length < 3) {
         throw new Error('El reparto de la pelicula debe incluir al menos tres caracteres como texto.');
       }
+      if (!movieInfo.url || movieInfo.url.length < 20) {
+        throw new Error('La url de la pelicula debe incluir al menos 20 caracteres como texto.');
+      }
 
       try {
         new Date(movieInfo.realease_date);
