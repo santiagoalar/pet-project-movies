@@ -15,7 +15,7 @@ module.exports = function makeAddComment(){
         })
         
         value = await movie.save().then(result =>{
-            mongoose.connection.close()
+            //mongoose.connection.close()
             return result
         }).catch(err =>{
             console.log(err);

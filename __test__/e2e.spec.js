@@ -29,12 +29,12 @@ describe('Movie API', () => {
   describe('adding movies', () => {
     // Content moderator API only allows 1 request per second.
     //beforeEach(done => setTimeout(() => done(), 1100))
-    /*it('adds a movie to the database', async () => {
+    it('adds a movie to the database', async () => {
       const response = await axios.post(
         '/movie/',
         makeFakeMovie({
             name: "Juan",
-            realease_date: "2021-05-27",
+            realease_date: new Date("2021-05-27"),
             director: "Craig Gillespie",
             genre: "Comedy, Drama, Adventure, Crime",
             cast: "Emma Stone, Emma Thompson, Joel Fry, Paul Walter Hauser, Emily Beecham,                            Kirby Howell-Baptiste, Mark Strong",
@@ -42,14 +42,13 @@ describe('Movie API', () => {
         })
       )
       expect(response.status).toBe(201)
-      //const { posted } = response.data
-      //console.log("posted")
-      //console.log(posted)
-      //const doc = await Movie.findById(id).exec()
-      //expect(doc).toEqual(posted)
+      const { posted } = response.data
+      const doc= await Movie.findById(posted._id).exec()
+      expect(doc.name).toEqual(posted.name);
       //expect(doc.published).toBe(true)
-      //return commentsDb.remove(posted)
-    })*/
+      console.log(posted._id);
+      return await Movie.findByIdAndRemove(posted._id);
+    })
     it('requires movie to contain an director', async () => {
       const response = await axios.post(
         '/movie',
@@ -95,26 +94,7 @@ describe('Movie API', () => {
       expect(response.status).toBe(400)
       expect(response.data.error).toBeDefined()
     })
-    /*it('scrubs malicious content', async () => {
-      const response = await axios.post(
-        '/comments',
-        makeFakeComment({
-          id: undefined,
-          text: '<script>attack!</script><p>hello!</p>'
-        })
-      )
-      expect(response.status).toBe(201)
-      expect(response.data.posted.text).toBe('<p>hello!</p>')
-      return commentsDb.remove(response.data.posted)
-    })
-    it("won't publish profanity", async () => {
-      const profane = makeFakeComment({ id: undefined, text: 'You suck!' })
-      const response = await axios.post('/comments', profane)
-      expect(response.status).toBe(201)
-      expect(response.data.posted.published).toBe(false)
-      return commentsDb.remove(response.data.posted)
-    })
-    it.todo("won't publish spam")*/
+    //it.todo("won't publish spam")
   })
   describe('modifying movies', () => {
     // Content moderator API only allows 1 request per second.
@@ -124,50 +104,71 @@ describe('Movie API', () => {
             name: 'Anaconda'
         })
         const movie = new Movie(fakeMovie);
-        await movie.save().then(result =>{
-            mongoose.connection.close()
-        })
+        await movie.save();
         const response = await axios.patch(`/movie/${movie._id}`, movie)
         expect(response.status).toBe(200)
         expect(response.data.patched.name).toBe('Anaconda')
-        //return Movie.deleteOne({name: "Anaconda"})
+        return await Movie.deleteOne({name: "Anaconda"})
+    })
+    it('modifies a movie url', async () => {
+      const fakeMovie = makeFakeMovie({
+          url: 'http://new-url.com'
+      })
+      const movie = new Movie(fakeMovie);
+      value = await movie.save();
+      const response = await axios.patch(`/movie-url/${movie._id}`, movie)
+      expect(response.status).toBe(200)
+      expect(response.data.patched.url).toBe('http://new-url.com')
+      return await Movie.deleteOne({url: "http://new-url.com"});
     })
   })
-  /*describe('modifying movies url', () => {
-    // Content moderator API only allows 1 request per second.
-    //beforeEach(done => setTimeout(() => done(), 6100))
-    it('modifies a movie url', async () => {
-        const fakeMovie = makeFakeMovie({
-            url: 'http://new-url.com'
-        })
-        const movie = new Movie(fakeMovie);
-        value = await movie.save().then(result =>{
-            mongoose.connection.close()
-        })
-        const response = await axios.patch(`/movie-url/${movie._id}`, movie)
-        expect(response.status).toBe(200)
-        expect(response.data.patched.url).toBe('http://new-url.com')
-    })
-  })*/
     describe('deleting movie', () => {
-        it('hard deletes', async () => {
-            const fakeMovie = makeFakeMovie();
-            const movie = new Movie(fakeMovie);
-            await movie.save().then(result =>{
-                mongoose.connection.close()
-            })
-            const result = await axios.delete(`/movie/${movie._id}`)
-            expect(result.data.deleted.deletedCount).toBe(1)
-            expect(result.data.deleted.softDelete).toBe(false)
+      it('hard deletes', async () => {
+          const fakeMovie = makeFakeMovie();
+          const movie = new Movie(fakeMovie);
+          await movie.save()
+          const result = await axios.delete(`/movie/${movie._id}`);
+          expect(result.data.deleted.director).toBe(movie.director);
+          expect(result.data.deleted.cast).toBe(movie.cast);
+          //expect(result.data.deleted.deletedCount).toBe(1)
+          //expect(result.data.deleted.softDelete).toBe(false)
+      })
+    })
+    describe('listing movies', () => {
+      it('lists movies by director', async () => {
+        const movie1 = new Movie(makeFakeMovie());
+        const movie2 = new Movie(makeFakeMovie({
+          director: movie1.director
+        }));
+        await movie1.save();
+        await movie2.save();
+
+        const response = await axios.get('/movies-director/', {
+          params: { director: movie1.director }
         })
-        /*it('soft deletes', async () => {
-            const comment = makeFakeComment()
-            const reply = makeFakeComment({ replyToId: comment.id })
-            await commentsDb.insert(comment)
-            await commentsDb.insert(reply)
-            const result = await axios.delete(`/comments/${comment.id}`)
-            expect(result.data.deleted.deletedCount).toBe(1)
-            expect(result.data.deleted.softDelete).toBe(true)
-        })*/
+        expect(response.data.length).toEqual(2);
+        expect(response.data[0].name).toEqual(movie1.name);
+        expect(response.data[1].name).toEqual(movie2.name);
+        
+        return await Movie.deleteMany({director: movie1.director});
+      })
+      it('lists movies by director', async () => {
+        const movie1 = new Movie(makeFakeMovie());
+        const movie2 = new Movie(makeFakeMovie({
+          genre: movie1.genre
+        }));
+        await movie1.save();
+        await movie2.save();
+
+        const response = await axios.get('/movies-genre/', {
+          params: { genre: movie1.genre }
+        })
+
+        expect(response.data.length).toEqual(2);
+        expect(response.data[0].name).toEqual(movie1.name);
+        expect(response.data[1].name).toEqual(movie2.name);
+        
+        return await Movie.deleteMany({genre: movie1.genre});
+      })
     })
 })

@@ -1,4 +1,4 @@
-module.exports = function makeGetMovie ({ listMovie, listMoviesGenre }) {
+module.exports = function makeGetMovie ({ listMovie, listMoviesGenre, listTopMovies }) {
     return async function getMovie (httpRequest) {
       const headers = {
         'Content-Type': 'application/json'
@@ -13,9 +13,19 @@ module.exports = function makeGetMovie ({ listMovie, listMoviesGenre }) {
             statusCode: 200,
             body: postMovie
           }
-        }else{
+        }else if(listMoviesGenre){
           const postMovie = await listMoviesGenre({
-            genre: httpRequest.body.genre
+            genre: httpRequest.query.genre
+            //genre: httpRequest.body.genre
+          })
+          return {
+            headers,
+            statusCode: 200,
+            body: postMovie
+          }
+        }else if(listTopMovies){
+          const postMovie = await listTopMovies({
+            //genre: httpRequest.body.genre
           })
           return {
             headers,

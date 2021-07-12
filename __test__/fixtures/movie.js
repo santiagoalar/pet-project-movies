@@ -16,7 +16,7 @@ function md5 (text) {
 
 module.exports = function makeFakeMovie (overrides) {
   const movie = {
-    name: faker.name.title,
+    name: faker.name.title(),
     realease_date: "2021-06-13",
     director: faker.name.findName(),
     genre: faker.music.genre(),

@@ -9,6 +9,7 @@ const {postMovie,
   getMovie, 
   getMoviesDirector, 
   getMoviesGenre,
+  getTopMovies,
   patchMovie,
   patchMovieUrl, 
   deleteMovie
@@ -36,6 +37,7 @@ app.get(`${apiRoot}/movie`, makeCallback(getMovie));
 app.get(`${apiRoot}/all-movies/`, makeCallback(getMovie));
 app.get(`${apiRoot}/movies-director/`, makeCallback(getMoviesDirector));
 app.get(`${apiRoot}/movies-genre/`, makeCallback(getMoviesGenre)); // get by genre
+app.get(`${apiRoot}/top-movies`, makeCallback(getTopMovies))
 app.patch(`${apiRoot}/movie/:id`, makeCallback(patchMovie)); //patch name
 app.patch(`${apiRoot}/movie-url/:id`, makeCallback(patchMovieUrl)); //patch url
 app.delete(`${apiRoot}/movie/:id`, makeCallback(deleteMovie));
