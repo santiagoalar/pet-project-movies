@@ -1,0 +1,24 @@
+@startuml casosDeUsos
+left to right direction
+
+actor Admin as a
+actor User as u
+
+package App {
+  usecase "Crear url-movie" as UC1
+  usecase "Editar url-movie" as UC2
+  usecase "Eliminar url-movie" as UC3
+  usecase "Imprimir url-movie" as UC4
+  usecase "Buscar película por genero" as UC5
+  usecase "Buscar película por año" as UC6
+  usecase "Sugerir película" as UC7
+}
+a --> UC1
+a --> UC2
+a --> UC3
+a --> UC4
+u --> UC4
+u --> UC5
+u --> UC6
+u --> UC7
+@enduml

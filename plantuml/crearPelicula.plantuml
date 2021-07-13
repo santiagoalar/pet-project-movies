@@ -1,0 +1,30 @@
+@startuml
+participant User
+
+User -> Route: httpRequest
+activate Route
+
+Route -> Controller: Redirect to Controller
+activate Controller
+deactivate Route
+
+Controller --> Services:postMovie
+activate Services
+
+Services -> Model: pelicula.save()
+activate Model
+
+Model -> MongoDB: <<Post through Mongoose>>
+activate MongoDB
+deactivate Model
+
+MongoDB --> Services: callback
+destroy MongoDB
+
+Services --> Controller: callback
+deactivate Services
+
+Controller --> User: res.status(200).json
+deactivate Controller
+
+@enduml
